@@ -61,3 +61,4 @@ void mostrarEnLed(int16 resultado)
    output_A(resultado);
    output_B(resultado>>6);
    output_E(resultado>>10);
+}
