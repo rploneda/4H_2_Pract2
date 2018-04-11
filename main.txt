@@ -2,44 +2,62 @@
 #fuses INTRC_IO, NOFCMEN, NOIESO, PUT, NOBROWNOUT, NOWDT
 #fuses NOPBADEN, NOMCLR, STVREN, NOLVP, NODEBUG
 #use delay(clock=16000000)
-//#int_rb
+
+void mostrarEnLed(int16 resultado);
 
 void main (void){
    setup_oscillator(OSC_16MHZ);
    set_tris_A(0x00);
    set_tris_E(0x08);
-   set_tris_B(0xF0); 
+   set_tris_B(0xF0);
    set_tris_C(0xFF);
    set_tris_D(0xFF);
-   //port_b_pullups(true);
-   //enable_interrupts(int_RB);
-   //enable_interrupts(global);
+   int8 primerOperando;
+   int8 segundoOperando;
    int16 resultado;
    for(;;){
-      int8 primerOperando=input_c();
-      int8 segundoOperando=input_d();
+      primerOperando=input_c();
+      segundoOperando=input_d();
       if(input(pin_B4)){
          delay_ms(250);
-         while((input(PIN_B4)));//efecto antirebote
+         while((input(PIN_B4)));//Efecto antirebote
          resultado=primerOperando+segundoOperando;
+         mostrarEnLed(resultado);
       }
       if(input(pin_B5)){
          delay_ms(250);
          while((input(PIN_B5)));
          resultado=primerOperando-segundoOperando;
+         mostrarEnLed(resultado);
       }
       if(input(pin_B6)){
          delay_ms(250);
          while((input(PIN_B6)));
          resultado=primerOperando*segundoOperando;
+         mostrarEnLed(resultado);
       }
       if(input(pin_B7)){
-         delay_ms(250);
-         while((input(PIN_B7)));
-         resultado=primerOperando/segundoOperando;
+         if(segundoOperando==0||segundoOperando>primerOperando){
+            delay_ms(250);
+            while((input(PIN_B7)));
+            for(int i=0;i<5;i++){
+            mostrarEnLed(8191);
+            delay_ms(250);
+            mostrarEnLed(0);
+            delay_ms(250);
+            }
+         }
+         else{
+            delay_ms(250);
+            while((input(PIN_B7)));
+            resultado=primerOperando/segundoOperando;
+            mostrarEnLed(resultado);
+         }  
       }
-      output_A(res);
-      output_B(res<<6);
-      output_E(res<<10)
    }
 }
+void mostrarEnLed(int16 resultado)
+{
+   output_A(resultado);
+   output_B(resultado>>6);
+   output_E(resultado>>10);
