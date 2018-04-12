@@ -2,41 +2,47 @@
 #fuses INTRC_IO, NOFCMEN, NOIESO, PUT, NOBROWNOUT, NOWDT
 #fuses NOPBADEN, NOMCLR, STVREN, NOLVP, NODEBUG
 #use delay(clock=16000000)
+#use fast_io(a)
+#use fast_io(e)
+#use fast_io(b)
+#use fast_io(c)
+#use fast_io(d)
 
 void mostrarEnLed(int16 resultado);
 
 void main (void){
    setup_oscillator(OSC_16MHZ);
-   set_tris_A(0x00);
-   set_tris_E(0x08);
-   set_tris_B(0xF0);
-   set_tris_C(0xFF);
-   set_tris_D(0xFF);
+   setup_adc(NO_ANALOGS);
+   set_tris_a(0b11000000);
+   set_tris_e(0x08);
+   set_tris_b(0xF0);
+   set_tris_c(0xFF);
+   set_tris_d(0xFF);
    int8 primerOperando;
    int8 segundoOperando;
    int16 resultado;
    for(;;){
       primerOperando=input_c();
       segundoOperando=input_d();
-      if(input(pin_B4)){
+      if(input(PIN_B4)){
          delay_ms(250);
          while((input(PIN_B4)));//Efecto antirebote
          resultado=primerOperando+segundoOperando;
          mostrarEnLed(resultado);
       }
-      if(input(pin_B5)){
+      if(input(PIN_B5)){
          delay_ms(250);
          while((input(PIN_B5)));
          resultado=primerOperando-segundoOperando;
          mostrarEnLed(resultado);
       }
-      if(input(pin_B6)){
+      if(input(PIN_B6)){
          delay_ms(250);
          while((input(PIN_B6)));
          resultado=primerOperando*segundoOperando;
          mostrarEnLed(resultado);
       }
-      if(input(pin_B7)){
+      if(input(PIN_B7)){
          if(segundoOperando==0||segundoOperando>primerOperando){
             delay_ms(250);
             while((input(PIN_B7)));
@@ -58,7 +64,7 @@ void main (void){
 }
 void mostrarEnLed(int16 resultado)
 {
-   output_A(resultado);
-   output_B(resultado>>6);
-   output_E(resultado>>10);
+   output_a(resultado);
+   output_b(resultado>>6);
+   output_e(resultado>>10);
 }
