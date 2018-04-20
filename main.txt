@@ -1,51 +1,41 @@
 #include <18F4520.h>
 #fuses INTRC_IO, NOFCMEN, NOIESO, PUT, NOBROWNOUT, NOWDT
 #fuses NOPBADEN, NOMCLR, STVREN, NOLVP, NODEBUG
-#use delay(clock=16000000)
+#use delay(clock=16M)
 #use fast_io(a)
 #use fast_io(e)
 #use fast_io(b)
 #use fast_io(c)
 #use fast_io(d)
 
-void mostrarEnLed(int16 resultado);
+void mostrarEnLed(long resultado);
 
 void main (void){
    setup_oscillator(OSC_16MHZ);
    setup_adc(NO_ANALOGS);
-   set_tris_a(0b11000000);
+   set_tris_a(0x00);
    set_tris_e(0x08);
    set_tris_b(0xF0);
    set_tris_c(0xFF);
    set_tris_d(0xFF);
-   int8 primerOperando;
-   int8 segundoOperando;
-   int16 resultado;
    for(;;){
-      primerOperando=input_c();
-      segundoOperando=input_d();
       if(input(PIN_B4)){
          delay_ms(250);
          while((input(PIN_B4)));//Efecto antirebote
-         resultado=primerOperando+segundoOperando;
-         mostrarEnLed(resultado);
+         mostrarEnLed((long)input_c()+(long)input_d());
       }
-      if(input(PIN_B5)){
+      else if(input(PIN_B5)){
          delay_ms(250);
          while((input(PIN_B5)));
-         resultado=primerOperando-segundoOperando;
-         mostrarEnLed(resultado);
+         mostrarEnLed((long)input_c()-(long)input_d());
       }
-      if(input(PIN_B6)){
+      else if(input(PIN_B6)){
          delay_ms(250);
          while((input(PIN_B6)));
-         resultado=primerOperando*segundoOperando;
-         mostrarEnLed(resultado);
+         mostrarEnLed((long)input_c()*(long)input_d());
       }
-      if(input(PIN_B7)){
-         if(segundoOperando==0||segundoOperando>primerOperando){
-            delay_ms(250);
-            while((input(PIN_B7)));
+      else if(input(PIN_B7)){
+         if(input_d()==0||input_d()>input_c()){
             for(int i=0;i<5;i++){
             mostrarEnLed(8191);
             delay_ms(250);
@@ -56,13 +46,12 @@ void main (void){
          else{
             delay_ms(250);
             while((input(PIN_B7)));
-            resultado=primerOperando/segundoOperando;
-            mostrarEnLed(resultado);
+            mostrarEnLed((long)input_c()/(long)input_d());
          }  
       }
    }
 }
-void mostrarEnLed(int16 resultado)
+void mostrarEnLed(long resultado)
 {
    output_a(resultado);
    output_b(resultado>>6);
